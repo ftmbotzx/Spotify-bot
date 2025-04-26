@@ -90,22 +90,30 @@ class Song:
         yt_link = str("https://www.youtube.com/" + yt_url)
         return yt_link
 
-    def yt_download(self, yt_link=None):
-        options = {
-            # PERMANENT options
-            'format': 'bestaudio/best',
-            'keepvideo': True,
-            'outtmpl': f'{self.path}/{self.id}',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '320'
-            }],
-        }
-        if yt_link is None:
-            yt_link = self.yt_link()
-        with yt_dlp.YoutubeDL(options) as mp3:
-            mp3.download([yt_link])
+
+def yt_download(self, yt_link=None):
+    options = {
+        'format': 'bestaudio/best',
+        'keepvideo': True,
+        'outtmpl': f'{self.path}/{self.id}',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '320'
+        }],
+        # NEW: add cookies file to bypass bot check
+        'cookiefile': 'cookies.txt',
+        'noplaylist': True,  # optional: avoid downloading full playlists accidentally
+        'quiet': True,       # optional: make logs cleaner
+    }
+    if yt_link is None:
+        yt_link = self.yt_link()
+    if yt_link is None:
+        raise Exception("Unable to find YouTube link matching the song.")
+    
+    with yt_dlp.YoutubeDL(options) as mp3:
+        mp3.download([yt_link])
+        
 
     def lyrics(self):
         try:
